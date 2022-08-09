@@ -4,7 +4,7 @@ This is my study project.
 #Build Cmake
 ```powershell
 git clone https://github.com/Amongus7719/TankEngine
-cd BattleCity
+cd TankCity
 mkdir build
 cmake ..
 cmake --build .
