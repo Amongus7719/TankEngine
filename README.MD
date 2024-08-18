@@ -11,4 +11,4 @@ cmake --build .
 ```
 
 # Reborn
-This project is not abandoned now, work the project will be update
+This project is not abandoned now, work for project will be update
