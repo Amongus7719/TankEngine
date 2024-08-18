@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 set(Project_NAME TankEngine)
 project(TankEngine)
 
-add_executable(TankEngine src/main.cpp)
+add_executable(${PROJECT_NAME}
+    src/main.cpp)
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
