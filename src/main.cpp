@@ -50,7 +50,7 @@ int main(int argc, char** argv)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
-    GLFWwindow* pWindow = glfwCreateWindow(g_windowSizeX, g_windowSizeY, "Battle City", nullptr, nullptr);
+    GLFWwindow* pWindow = glfwCreateWindow(g_windowSizeX, g_windowSizeY, "Tank Engine", nullptr, nullptr);
     if (!pWindow)
     {
         std::cout << "glfwCreateWindow failed!" << std::endl;
@@ -82,6 +82,8 @@ int main(int argc, char** argv)
             std::cerr << "Can't create shader program: " << "DefaultShader" << std::endl;
             return -1;
         }
+
+        resourceManager.loadTexture("DefaultTexture", "/res/textures/map_16x16.png");
 
         GLuint points_vbo = 0;
         glGenBuffers(1, &points_vbo);
