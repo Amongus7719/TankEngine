@@ -1,21 +1,18 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-
 #include <iostream>
-using namespace std;
 
-int g_windowSizeX = 640;
-int g_windowSizeY = 480;
+#include "Renderer/ShaderProgram.h"
 
-GLfloat point[] = {                               //Shaders
-    0.0f,  0.5f, 0.0f,
+GLfloat point[] = {
+     0.0f,  0.5f, 0.0f,
      0.5f, -0.5f, 0.0f,
     -0.5f, -0.5f, 0.0f
 };
 
-GLfloat colors [] = {
-   1.0f, 0.0f, 0.0f,
+GLfloat colors[] = {
+    1.0f, 0.0f, 0.0f,
     0.0f, 1.0f, 0.0f,
     0.0f, 0.0f, 1.0f
 };
@@ -38,73 +35,71 @@ const char* fragment_shader =
 "   frag_color = vec4(color, 1.0);"
 "}";
 
-void glfwWindowSizeCallBack(GLFWwindow* pwindow, int width, int height)    //Screen
+
+int g_windowSizeX = 640;
+int g_windowSizeY = 480;
+
+void glfwWindowSizeCallback(GLFWwindow* pWindow, int width, int height)
 {
     g_windowSizeX = width;
     g_windowSizeY = height;
     glViewport(0, 0, g_windowSizeX, g_windowSizeY);
 }
 
-void glfwKeyCallBack(GLFWwindow* pwindow, int key, int scancode, int action, int mode) //Key Input
+void glfwKeyCallback(GLFWwindow* pWindow, int key, int scancode, int action, int mode)
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     {
-        glfwSetWindowShouldClose(pwindow, GL_TRUE);
+        glfwSetWindowShouldClose(pWindow, GL_TRUE);
     }
 }
 
 int main(void)
 {
     /* Initialize the library */
-    if (!glfwInit()){
-        cout << "GLFWInit failed!" << endl; 
+    if (!glfwInit())
+    {
+        std::cout << "glfwInit failed!" << std::endl;
         return -1;
     }
-        
+
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
-    GLFWwindow* pwindow = glfwCreateWindow(g_windowSizeX, g_windowSizeY , "TankEngine AKA Battle City", nullptr, nullptr);
-    if (!pwindow)
+    GLFWwindow* pWindow = glfwCreateWindow(g_windowSizeX, g_windowSizeY, "Tank Engine", nullptr, nullptr);
+    if (!pWindow)
     {
-        cout << "glfwCreateWindow failed" << endl;
+        std::cout << "glfwCreateWindow failed!" << std::endl;
         glfwTerminate();
         return -1;
     }
 
-    glfwSetWindowSizeCallback(pwindow, glfwWindowSizeCallBack);
-    glfwSetKeyCallback(pwindow, glfwKeyCallBack);
+    glfwSetWindowSizeCallback(pWindow, glfwWindowSizeCallback);
+    glfwSetKeyCallback(pWindow, glfwKeyCallback);
 
     /* Make the window's context current */
-    glfwMakeContextCurrent(pwindow);
+    glfwMakeContextCurrent(pWindow);
 
-   if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
-        cout << "Failed to initialize OpenGL context" << endl;
-        return -1;
+    if (!gladLoadGL())
+    {
+        std::cout << "Can't load GLAD!" << std::endl;
     }
-    
-   cout << "Renderer: " << glGetString(GL_RENDERER) << endl;
-   cout << "OpenGL Version: " << glGetString(GL_VERSION);
+
+    std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
+    std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 
     glClearColor(1, 1, 0, 1);
 
-    GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vs, 1, &vertex_shader, nullptr);
-    glCompileShader(vs);
-
-    GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fs, 1, &fragment_shader, nullptr);
-    glCompileShader(fs);
-
-    GLuint shader_program = glCreateProgram();
-    glAttachShader(shader_program, vs);
-    glAttachShader(shader_program, fs);
-    glLinkProgram(shader_program);
-
-    glDeleteShader(vs);
-    glDeleteShader(fs);
+    std::string vertexShader(vertex_shader);
+    std::string fragmentShader(fragment_shader);
+    Renderer::ShaderProgram shaderProgram(vertexShader, fragmentShader);
+    if (!shaderProgram.isCompiled())
+    {
+        std::cerr << "Can't create shader program!" << std::endl;
+        return -1;
+    }
 
     GLuint points_vbo = 0;
     glGenBuffers(1, &points_vbo);
@@ -129,17 +124,17 @@ int main(void)
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
     /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(pwindow))
+    while (!glfwWindowShouldClose(pWindow))
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shader_program);
+        shaderProgram.use();
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         /* Swap front and back buffers */
-        glfwSwapBuffers(pwindow);
+        glfwSwapBuffers(pWindow);
 
         /* Poll for and process events */
         glfwPollEvents();
